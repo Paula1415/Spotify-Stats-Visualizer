@@ -8,11 +8,8 @@
 </head>
 <body>
     <h1>landing page</h1>
-    <script>console.log(window.location.href)</script>
-    {{% block content %}}
-    <div>
-        {{ code }}
-    </div>
-    {{% endblock content %}}
+    {% block includes %}
+        <h1>{{ tok }}</h1>
+    {% endblock includes %}
 </body>
 </html>
