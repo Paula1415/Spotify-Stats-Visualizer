@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>on error</title>
 </head>
 <body>
-    <h1>this is the page where all your stats are</h1>
+    <h1>You need to authorize the access</h1>
     {% block includes %}
-        <p>{{ userdata }}</p>
+        {{ error }}
+
+        <a href="{{ auth }}">
+            <button>authorize</button>
+        </a>
     {% endblock includes %}
 </body>
 </html>
