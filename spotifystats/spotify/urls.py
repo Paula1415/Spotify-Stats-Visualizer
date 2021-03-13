@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path('', views.landingPage, name = 'landingpage'),
     path('get-auth-url/', views.getauth),
-    path('Stats/', views.getUserdata)
+    path('callback/', views.callback),
+    path('Stats/', views.getuserdata)
 
 ]

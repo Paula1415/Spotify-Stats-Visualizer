@@ -7,6 +7,20 @@
     <title>userdata</title>
 </head>
 <body>
-    <h1>here are your stats</h1>
+    <h1>your stats</h1>
+    {% block include %}
+        <ul>
+            <li>{{ userdata.0 }}</li>
+            <li>{{ userdata.1 }}</li>
+            <li>{{ userdata.2 }}</li>
+            <li>{{ userdata.3 }}</li>
+            <li>{{ userdata.4 }}</li>
+            <li>{{ userdata.5 }}</li>
+            <li>{{ userdata.6 }}</li>
+            <li>{{ userdata.7 }}</li>
+            <li>{{ userdata.8 }}</li>
+            <li>{{ userdata.9 }}</li>
+        </ul>
+    {% endblock include %}
 </body>
 </html>

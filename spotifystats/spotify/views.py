@@ -5,16 +5,16 @@ from urllib.parse import urlparse
 from .authHandling import getuserdata
 
 
+spotify = getuserdata()
 
 def getauth(request):
-    token = getuserdata()
-    token.getauth()
+    return spotify.getauth(request)
 
-def getUserdata(request):
-    # data = getuserdata()
-    # tracks = data.getdata()
-    # context = {'userdata' : tracks}
-    return render(request, 'userdata.html')
+def callback(request):
+    return spotify.spotify_callback(request)
+
+def getuserdata(request):
+    return spotify.userdata(request)
 
 def landingPage(request):
     return render(request, 'landingpage.html')
