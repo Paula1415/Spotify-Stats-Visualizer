@@ -4,23 +4,30 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>userdata</title>
+    <title>tracks</title>
 </head>
 <body>
     <h1>your stats</h1>
     {% block include %}
+        <h3>top tracks</h3>
         <ul>
-            <li>{{ userdata.0 }}</li>
-            <li>{{ userdata.1 }}</li>
-            <li>{{ userdata.2 }}</li>
-            <li>{{ userdata.3 }}</li>
-            <li>{{ userdata.4 }}</li>
-            <li>{{ userdata.5 }}</li>
-            <li>{{ userdata.6 }}</li>
-            <li>{{ userdata.7 }}</li>
-            <li>{{ userdata.8 }}</li>
-            <li>{{ userdata.9 }}</li>
+            <li>{{ tracks.0 }}</li>
+            <li>{{ tracks.1 }}</li>
+            <li>{{ tracks.2 }}</li>
+            <li>{{ tracks.3 }}</li>
+            <li>{{ tracks.4 }}</li>
         </ul>
+        <h3>top artists</h3>
+        <ul>
+            <li>{{ artists.0 }}</li>
+            <li>{{ artists.1 }}</li>
+            <li>{{ artists.2 }}</li>
+            <li>{{ artists.3 }}</li>
+            <li>{{ artists.4 }}</li>
+        <h3>audio analysis of user top tracks</h3>
+            {{ topuser }}
+        <h3>audio analysis of top 50 global playlist</h3>
+            {{ top50 }}
     {% endblock include %}
 </body>
 </html>
