@@ -4,6 +4,11 @@ from requests import Request
 from django.shortcuts import redirect, render
 import json
 from statistics import mean
+from optparse import OptionParser
+import inspect
+import time
+import pandas as pd
+import io
 
 class getuserdata:
     def __init__(self):
@@ -41,19 +46,21 @@ class getuserdata:
 
         #get audio analysis of top user tracks
         tracks_ids = [i.id for i in tracks.items]
-        usertracks_audio_features = spotify.tracks_audio_features(tracks_ids)
-        usertracks_audio_features = [i.acousticness for i in usertracks_audio_features]
-        usertracks_audio_features=mean(usertracks_audio_features)
+        usertracks_audio_features = spotify.tracks_audio_features(tracks_ids).json()
+        #usertracks_audio_features = [i for i in usertracks_audio_features]
+
+
 
         #get audio analysis of top 50 global
         top_50_global = spotify.playlist_items(playlist_id='37i9dQZEVXbMDoHDwVN2tF',offset=0, fields=['items.track.id'],limit=5)
         top_50_global= [item for val in top_50_global.values() for item in val]
         top_50_global= [top_50_global[i]['track']['id'] for i in range(len(top_50_global))]
-        globaltracks_audio_features = spotify.tracks_audio_features(top_50_global)
-        globaltracks_audio_features = [i.acousticness for i in globaltracks_audio_features]
-        globaltracks_audio_features = mean(globaltracks_audio_features)
+        globaltracks_audio_features = spotify.tracks_audio_features(top_50_global).json()
+        # globaltracks_audio_features = [i.acousticness for i in globaltracks_audio_features]
+        global_data  = pd.read_json(io.StringIO(globaltracks_audio_features))
+        global_df = pd.DataFrame(data = global_data)
 
-        context = {'tracks' : tracks_name, 'artists': artists, 'top50':globaltracks_audio_features, 'topuser': usertracks_audio_features}
+        context = {'tracks' : tracks_name, 'artists': artists, 'top50': global_df, 'topuser': usertracks_audio_features}
         return render(request, 'userdata.html', context)
 
 
