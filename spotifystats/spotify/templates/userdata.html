@@ -17,17 +17,10 @@
             <li>{{ tracks.3 }}</li>
             <li>{{ tracks.4 }}</li>
         </ul>
-        <h3>top artists</h3>
-        <ul>
-            <li>{{ artists.0 }}</li>
-            <li>{{ artists.1 }}</li>
-            <li>{{ artists.2 }}</li>
-            <li>{{ artists.3 }}</li>
-            <li>{{ artists.4 }}</li>
         <h3>audio analysis of user top tracks</h3>
-            {{ topuser }}
+            {{ user_plot|safe }}
         <h3>audio analysis of top 50 global playlist</h3>
-            {{ top50 }}
+            {{ global_plot|safe }}
     {% endblock include %}
 </body>
 </html>
