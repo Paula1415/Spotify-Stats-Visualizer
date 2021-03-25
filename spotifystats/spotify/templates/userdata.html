@@ -9,6 +9,7 @@
 <body>
     <h1>your stats</h1>
     {% block include %}
+        {{ x }}
         <h3>top tracks</h3>
         <ul>
             <li>{{ tracks.0 }}</li>
@@ -21,8 +22,11 @@
             {{ user_plot|safe }}
         <h3>audio analysis of top 50 global playlist</h3>
             {{ global_plot|safe }}
-        {{ pyplot|safe }}
-        {{ catplot|safe }}
+        <h3>today hits audio analysis</h3>
+            {{ today_plot|safe }}
+
+        {{ stripplot|safe }}
+        {{ bar_catplot|safe }}
     {% endblock include %}
 </body>
 </html>
