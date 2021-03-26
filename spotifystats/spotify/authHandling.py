@@ -49,8 +49,9 @@ class getuserdata:
         user_df = pd.DataFrame(data = usertracks_data)
         user_df['name'] = tracks_name
         user_df['playlist'] = 'Your Top 50 Tracks'
+        # here
         user_df_nameindex = user_df.truncate(after=4)
-        user_df_nameindex = user_df_nameindex.set_index(user_df['name'])
+        user_df_nameindex2 = user_df.set_index(user_df['name'])
         user_df_nameindex = user_df_nameindex.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo'])
 
 
