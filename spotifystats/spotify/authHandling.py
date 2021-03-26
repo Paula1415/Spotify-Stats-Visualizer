@@ -4,12 +4,13 @@ from requests import Request
 from django.shortcuts import redirect, render
 import json
 import pandas as pd
-import io
+from io import BytesIO, StringIO
 import base64
 import matplotlib.pyplot as plt
 import mpld3
 import seaborn as sns
 import numpy as np
+from matplotlib.ticker import FormatStrFormatter
 
 class getuserdata:
     def __init__(self):
@@ -44,10 +45,15 @@ class getuserdata:
         #get audio analysis of top user tracks
         tracks_ids = [i.id for i in tracks.items]
         usertracks_audio_features = spotify.tracks_audio_features(tracks_ids).json()
-        usertracks_data  = pd.read_json(io.StringIO(usertracks_audio_features))
+        usertracks_data  = pd.read_json(StringIO(usertracks_audio_features))
         user_df = pd.DataFrame(data = usertracks_data)
         user_df['name'] = tracks_name
         user_df['playlist'] = 'Your Top 50 Tracks'
+        user_df_nameindex = user_df.truncate(after=4)
+        user_df_nameindex = user_df_nameindex.set_index(user_df['name'])
+        user_df_nameindex = user_df_nameindex.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo'])
+
+
 
         #get audio analysis of top 50 global
         top_50_global = spotify.playlist_items(playlist_id='37i9dQZEVXbMDoHDwVN2tF',offset=0,limit=50).json()
@@ -57,7 +63,7 @@ class getuserdata:
         top_50_global_ids = [n['id'] for n in top_50_global]
         globaltracks_audio_features = spotify.tracks_audio_features(top_50_global_ids).json()
         # create dataframe
-        global_data  = pd.read_json(io.StringIO(globaltracks_audio_features))
+        global_data  = pd.read_json(StringIO(globaltracks_audio_features))
         global_df = pd.DataFrame(data = global_data)
         global_df['name'] = top_50_global_names
         global_df['playlist'] = 'Top 50: Global'
@@ -71,7 +77,7 @@ class getuserdata:
         top_50_today_ids = [n['id'] for n in top_50_today]
         globaltoday_audio_features = spotify.tracks_audio_features(top_50_today_ids).json()
         # create dataframe
-        today_global_data  = pd.read_json(io.StringIO(globaltoday_audio_features))
+        today_global_data  = pd.read_json(StringIO(globaltoday_audio_features))
         today_global_df = pd.DataFrame(data = today_global_data)
         today_global_df['name'] = top_50_today_names
         today_global_df['playlist'] = "Today's Top Hits"
@@ -80,6 +86,7 @@ class getuserdata:
         frames_to_merge = [user_df, global_df, today_global_df]
         tidy_frame = pd.concat(frames_to_merge)
         # tidy_frame.to_excel('tidyframe.xlsx')
+
 
         df1_melt = pd.melt(user_df, id_vars=['playlist'], var_name='property')
         df2_melt = pd.melt(global_df, id_vars=['playlist'], var_name='property')
@@ -109,30 +116,52 @@ class getuserdata:
         df3_melt_mean = df3_melt_nonnumeric.groupby(['property']).mean(numeric_only = True)
         df3_melt_mean['playlist'] = 'Top 50 daily Hits'
 
+
         ##----------- concat all long dataframes ------------------------------
         numeric_only_frames = [df1_melt_mean, df2_melt_mean, df3_melt_mean]
         long_frame = pd.concat(numeric_only_frames)
         long_frame2 = long_frame.reset_index()
-        long_frame2.to_excel('longframe.xlsx')
+        final_long_frame = long_frame2.astype({'property': str})
+        final_long_frame= final_long_frame.drop([2, 5, 7, 10, 11, 15, 18,20,  23, 24, 28, 31,33, 36, 37 ])
+        final_long_frame.to_excel('longframe.xlsx')
+
+        df1_melt_mean_reset = df1_melt_mean.reset_index()
 
 
         #-----------PLOTS----------------------------------------
         # scatterplot
-        stripplot = sns.scatterplot(data=tidy_frame, x="energy", y="valence", hue="playlist")
+        sns.set_style("white")
+        stripplot = sns.scatterplot(data=tidy_frame, x="energy", y="valence", hue="playlist",palette="ch:.25", s=100)
+        stripplot.set_title('scatterplot plotting the relation between energy and valence')
         stripplot_fig = stripplot.get_figure()
         stripplot_render = mpld3.fig_to_html(stripplot_fig)
 
 
         #bar catplot
         bar_catplot = sns.catplot(
-            data=long_frame2, kind="violin",
-            x="property", y="value", hue="playlist", legend=True
-        )
-        bar_catplot_figure = bar_catplot.fig
-        catplot_render = mpld3.fig_to_html(bar_catplot_figure)
+            kind="bar",data=final_long_frame, x="property", y= "value", palette="ch:.25", hue="playlist", legend=False)
+        bar_catplot.fig.suptitle("mean values of the audio features")
+        plt.legend(loc='upper right')
+        for axes in bar_catplot.axes.flat:
+            _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=90)
+        plt.tight_layout()
 
 
-        context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render}
+        # encode the plot to base64 because mpld3 don't support cat data
+        bar_tmpfile = BytesIO()
+        bar_catplot.savefig(bar_tmpfile, format ='png')
+        encoded = base64.b64encode(bar_tmpfile.getvalue()).decode('utf-8')
+        catplot_render = r"<img src='data:image/png;base64,{}'>".format(encoded)
+
+        heatmap = sns.heatmap(data=user_df_nameindex)
+        heatmap_tmpfile = BytesIO()
+        heatmap.figure.savefig(heatmap_tmpfile, format ='png')
+        heatmap_encoded = base64.b64encode(heatmap_tmpfile.getvalue()).decode('utf-8')
+        heatmap_render = r"<img src='data:image/png;base64,{}'>".format(heatmap_encoded)
+
+
+
+        context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render}
         # return render(request, 'userdata.html', context)
         return render(request, 'userdata.html', context)
 
