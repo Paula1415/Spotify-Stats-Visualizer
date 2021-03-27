@@ -17,9 +17,19 @@
             <li>{{ tracks.3 }}</li>
             <li>{{ tracks.4 }}</li>
         </ul>
+        <h3>Scaterplot plotting the relation between energy and valence</h3>
         {{ stripplot|safe }}
+        <h3> Barplot comparing audio features</h3>
         {{ bar_catplot|safe }}
+        <h3>heatmap showing the value of each feature: min:0, max:1</h3>
         {{ heatmap|safe }}
+        <h3>kde plot showing the mean of every feature</h3>
+        <h4>user top tracks</h4>
+        {{ kdeplot|safe }}
+        <h4>Top 50: Global</h4>
+        {{ globalkde|safe}}
+        <h4>Today Top Hits</h4>
+        {{ todaykde|safe }}
     {% endblock include %}
 </body>
 </html>

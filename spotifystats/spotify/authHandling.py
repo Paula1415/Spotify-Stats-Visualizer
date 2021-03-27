@@ -6,6 +6,8 @@ import json
 import pandas as pd
 from io import BytesIO, StringIO
 import base64
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import mpld3
 import seaborn as sns
@@ -51,8 +53,12 @@ class getuserdata:
         user_df['playlist'] = 'Your Top 50 Tracks'
         # here
         user_df_nameindex = user_df.truncate(after=4)
-        user_df_nameindex2 = user_df.set_index(user_df['name'])
-        user_df_nameindex = user_df_nameindex.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo'])
+        index = user_df['name'].truncate(after=4)
+        user_df_nameindex2 = user_df_nameindex.set_index(index)
+        user_df_nameindex2 = user_df_nameindex2.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'mode', 'key'])
+        # user_df_nameindex2.to_excel('nameasindex.xlsx')
+
+        userdf_nottruncated = user_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode'])
 
 
 
@@ -69,6 +75,8 @@ class getuserdata:
         global_df['name'] = top_50_global_names
         global_df['playlist'] = 'Top 50: Global'
 
+        global_df_numeric = global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode'])
+
 
         # get audio analysis of today top hits
         top_50_today = spotify.playlist_items(playlist_id='37i9dQZF1DXcBWIGoYBM5M',offset=0,limit=50).json()
@@ -83,11 +91,13 @@ class getuserdata:
         today_global_df['name'] = top_50_today_names
         today_global_df['playlist'] = "Today's Top Hits"
 
+        today_global_df_numeric = today_global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode'])
+
 
         frames_to_merge = [user_df, global_df, today_global_df]
         tidy_frame = pd.concat(frames_to_merge)
         # tidy_frame.to_excel('tidyframe.xlsx')
-
+        onlynum_tidyframe = tidy_frame.drop(['id', 'analysis_url', 'duration_ms','key', 'loudness', 'tempo', 'time_signature', 'track_href', 'type', 'uri', 'name'], axis=1)
 
         df1_melt = pd.melt(user_df, id_vars=['playlist'], var_name='property')
         df2_melt = pd.melt(global_df, id_vars=['playlist'], var_name='property')
@@ -125,44 +135,66 @@ class getuserdata:
         final_long_frame = long_frame2.astype({'property': str})
         final_long_frame= final_long_frame.drop([2, 5, 7, 10, 11, 15, 18,20,  23, 24, 28, 31,33, 36, 37 ])
         final_long_frame.to_excel('longframe.xlsx')
-
         df1_melt_mean_reset = df1_melt_mean.reset_index()
-
 
         #-----------PLOTS----------------------------------------
         # scatterplot
-        sns.set_style("white")
+        sns.set_style("ticks")
         stripplot = sns.scatterplot(data=tidy_frame, x="energy", y="valence", hue="playlist",palette="ch:.25", s=100)
         stripplot.set_title('scatterplot plotting the relation between energy and valence')
         stripplot_fig = stripplot.get_figure()
         stripplot_render = mpld3.fig_to_html(stripplot_fig)
 
-
         #bar catplot
         bar_catplot = sns.catplot(
-            kind="bar",data=final_long_frame, x="property", y= "value", palette="ch:.25", hue="playlist", legend=False)
+            kind="bar",data=final_long_frame, x="property", y= "value", palette="ch:.25", hue="playlist", legend=True)
         bar_catplot.fig.suptitle("mean values of the audio features")
-        plt.legend(loc='upper right')
         for axes in bar_catplot.axes.flat:
             _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=90)
-        plt.tight_layout()
-
+        # plt.tight_layout()
 
         # encode the plot to base64 because mpld3 don't support cat data
         bar_tmpfile = BytesIO()
         bar_catplot.savefig(bar_tmpfile, format ='png')
+        plt.close()
         encoded = base64.b64encode(bar_tmpfile.getvalue()).decode('utf-8')
         catplot_render = r"<img src='data:image/png;base64,{}'>".format(encoded)
+        #heatmap
 
-        heatmap = sns.heatmap(data=user_df_nameindex)
+        heatmap = sns.heatmap(data=user_df_nameindex2)
         heatmap_tmpfile = BytesIO()
-        heatmap.figure.savefig(heatmap_tmpfile, format ='png')
+        heatmap.figure.savefig(heatmap_tmpfile, format ='png', bbox_inches = "tight")
+        heatmap.figure.savefig('heatmap.png')
+        plt.close()
         heatmap_encoded = base64.b64encode(heatmap_tmpfile.getvalue()).decode('utf-8')
         heatmap_render = r"<img src='data:image/png;base64,{}'>".format(heatmap_encoded)
 
+        # user kde
+        kde_plot = sns.kdeplot(data=userdf_nottruncated, palette="ch:.25")
+        kde_tmpfile = BytesIO()
+        kde_plot.figure.savefig(kde_tmpfile, format ='png')
+        plt.close()
+        encoded_kde = base64.b64encode(kde_tmpfile.getvalue()).decode('utf-8')
+        kde_render = r"<img src='data:image/png;base64,{}'>".format(encoded_kde)
 
+        #global kde
+        global_kde_plot = sns.kdeplot(data=global_df_numeric, palette="ch:.25")
+        global_kde_tmpfile = BytesIO()
+        global_kde_plot.figure.savefig(global_kde_tmpfile, format ='png')
+        plt.close()
+        global_encoded_kde = base64.b64encode(global_kde_tmpfile.getvalue()).decode('utf-8')
+        global_kde_render = r"<img src='data:image/png;base64,{}'>".format(global_encoded_kde)
 
-        context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render}
+        #today top hits kde
+
+        kde_plot_todhits = sns.kdeplot(data=today_global_df_numeric, palette="ch:.25")
+        todhits_kde_tmpfile = BytesIO()
+        kde_plot_todhits.figure.savefig(todhits_kde_tmpfile, format ='png')
+        plt.close()
+        todhits_encoded_kde = base64.b64encode(todhits_kde_tmpfile.getvalue()).decode('utf-8')
+        todhits_kde_render = r"<img src='data:image/png;base64,{}'>".format(todhits_encoded_kde)
+
+        context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render,  'kdeplot': kde_render, 'todaykde': todhits_kde_render, 'globalkde': global_kde_render}
         # return render(request, 'userdata.html', context)
         return render(request, 'userdata.html', context)
 
