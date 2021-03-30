@@ -34,11 +34,11 @@ class getuserdata:
         code = request.GET.get('code')
         error = request.GET.get('error')
         if error:
-            return redirect('http://127.0.0.1:8000/error/', error)
+            return redirect('https://spotistats-visualizer.herokuapp.com/error')
         credentials= tk.Credentials(*conf)
         not_refreshing_user_token = credentials.request_user_token(str(code))
         self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
-        return redirect('http://127.0.0.1:8000/Stats/')
+        return redirect('https://spotistats-visualizer.herokuapp.com/Stats')
 
     def userdata(self,request):
         #instanciate spotify class
