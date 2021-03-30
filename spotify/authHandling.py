@@ -47,7 +47,7 @@ class getuserdata:
         tracks = spotify.current_user_top_tracks(time_range = 'medium_term', limit=50, offset=0)
         tracks_items = [t for t in tracks.items]
         if not tracks_items:
-            return redirect('http://127.0.0.1:8000/nodata/')
+            return redirect('https://spotistats-visualizer.herokuapp.com/nodata')
         else:
             tracks_name = [t.name for t in tracks.items]
             #get audio analysis of top user tracks
