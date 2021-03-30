@@ -1,23 +1,30 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tracks</title>
+    <title>tracks</title>rel="stylesheet">
+    <script src="https://kit.fontawesome.com/38a8e64623.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'spotify/css/statspage.css' %}">
 </head>
 <body>
     <h1>your stats</h1>
     {% block include %}
-        <h3>top tracks</h3>
-        <ul>
-            <li>{{ tracks.0 }}</li>
-            <li>{{ tracks.1 }}</li>
-            <li>{{ tracks.2 }}</li>
-            <li>{{ tracks.3 }}</li>
-            <li>{{ tracks.4 }}</li>
-        </ul>
-        <h3>Scaterplot plotting the relation between energy and valence</h3>
+        <h3>top tracks </h3>
+        <div class="top-tracks">
+            <ul>
+                <li>{{ tracks.0 }}</li>
+                <li>{{ tracks.1 }}</li>
+                <li>{{ tracks.2 }}</li>
+                <li>{{ tracks.3 }}</li>
+                <li>{{ tracks.4 }}</li>
+            </ul>
+        </div>
+        {{ labels }}
         {{ stripplot|safe }}
         <h3> Barplot comparing audio features</h3>
         {{ bar_catplot|safe }}
