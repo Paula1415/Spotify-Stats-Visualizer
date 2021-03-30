@@ -9,8 +9,7 @@ var camera = new THREE.PerspectiveCamera(
 );
 camera.position.set(1, 1, 20);
 // Load a Renderer
-var renderer = new THREE.WebGLRenderer({ alpha: false });
-renderer.setClearColor(0xc5c5c3);
+var renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -28,9 +27,9 @@ var loader = new THREE.GLTFLoader();
 loader.load('/static/spotify/obj/scene.gltf', function (gltf) {
 	var object = gltf.scene;
 	gltf.scene.scale.set(2, 2, 2);
-	gltf.scene.position.x = 0;
-	gltf.scene.position.y = 0;
-	gltf.scene.position.z = 0;
+	gltf.scene.position.x = 10;
+	gltf.scene.position.y = 8;
+	gltf.scene.position.z = 10;
 });
 
 function animate() {

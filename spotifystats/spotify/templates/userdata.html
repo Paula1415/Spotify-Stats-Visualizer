@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{% static 'spotify/css/statspage.css' %}">
 </head>
 <body>
-    <h1>your stats</h1>
+    <h1>Your Stats</h1>
     {% block include %}
         <h3>top tracks </h3>
         <div class="top-tracks">
@@ -24,19 +24,40 @@
                 <li>{{ tracks.4 }}</li>
             </ul>
         </div>
-        {{ labels }}
+        <h3>top artists</h3>
+        <div class="top-artists">
+            <ul>
+                <li>{{ artists.0 }}</li>
+                <li>{{ artists.1 }}</li>
+                <li>{{ artists.2 }}</li>
+                <li>{{ artists.3 }}</li>
+                <li>{{ artists.4 }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="plots">
         {{ stripplot|safe }}
         <h3> Barplot comparing audio features</h3>
         {{ bar_catplot|safe }}
         <h3>heatmap showing the value of each feature: min:0, max:1</h3>
         {{ heatmap|safe }}
-        <h3>kde plot showing the mean of every feature</h3>
-        <h4>user top tracks</h4>
-        {{ kdeplot|safe }}
-        <h4>Top 50: Global</h4>
-        {{ globalkde|safe}}
-        <h4>Today Top Hits</h4>
-        {{ todaykde|safe }}
+        <div class="row">
+            <h3>kde plot showing the mean of every feature</h3>
+            <div class="column">
+                <h4>user top tracks</h4>
+                {{ kdeplot|safe }}
+            </div>
+            <div class="column">
+                <h4>Top 50: Global</h4>
+                {{ globalkde|safe}}
+            </div>
+            <div class="column">
+                <h4>Today Top Hits</h4>
+                {{ todaykde|safe }}
+            </div>
+
+        </div>
+    </div>
     {% endblock include %}
 </body>
 </html>

@@ -53,6 +53,9 @@ class getuserdata:
             tracks_name = [t.name for t in tracks.items]
             #get audio analysis of top user tracks
             tracks_ids = [i.id for i in tracks.items]
+            # get artists
+            artists = spotify.current_user_top_artists(time_range = 'medium_term', limit=5, offset=0)
+            artist_name = [t.name for t in artists.items]
             usertracks_audio_features = spotify.tracks_audio_features(tracks_ids).json()
             usertracks_data  = pd.read_json(StringIO(usertracks_audio_features))
             user_df = pd.DataFrame(data = usertracks_data)
@@ -212,7 +215,7 @@ class getuserdata:
             todhits_encoded_kde = base64.b64encode(todhits_kde_tmpfile.getvalue()).decode('utf-8')
             todhits_kde_render = r"<img src='data:image/png;base64,{}'>".format(todhits_encoded_kde)
 
-            context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render,  'kdeplot': kde_render, 'todaykde': todhits_kde_render, 'globalkde': global_kde_render}
+            context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render,  'kdeplot': kde_render, 'todaykde': todhits_kde_render, 'globalkde': global_kde_render, 'artists': artist_name }
 
             return render(request, 'userdata.html', context)
 
