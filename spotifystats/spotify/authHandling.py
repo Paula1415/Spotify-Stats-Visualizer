@@ -9,7 +9,6 @@ import base64
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import mpld3
 import seaborn as sns
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
