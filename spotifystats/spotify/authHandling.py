@@ -84,6 +84,7 @@ class getuserdata:
             global_df['playlist'] = 'Top 50: Global'
 
             global_df_numeric = global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode'])
+            global_df_numeric.to_excel('globaldf.xlsx')
 
 
             # get audio analysis of today top hits
@@ -187,7 +188,7 @@ class getuserdata:
             heatmap_render = r"<img src='data:image/png;base64,{}'>".format(heatmap_encoded)
 
             # user kde
-            kde_plot = sns.kdeplot(data=userdf_nottruncated, palette="mako")
+            kde_plot = sns.kdeplot(data=userdf_nottruncated, palette="mako", shade=True)
             kde_tmpfile = BytesIO()
             kde_plot.figure.savefig(kde_tmpfile, format ='png', facecolor="#1b1b1b")
             plt.close()
@@ -195,7 +196,7 @@ class getuserdata:
             kde_render = r"<img src='data:image/png;base64,{}'>".format(encoded_kde)
 
             #global kde
-            global_kde_plot = sns.kdeplot(data=global_df_numeric, palette="mako")
+            global_kde_plot = sns.kdeplot(data=global_df_numeric, palette="mako", fill=True)
             global_kde_tmpfile = BytesIO()
             global_kde_plot.figure.savefig(global_kde_tmpfile, format ='png', facecolor="#1b1b1b")
             plt.close()
