@@ -13,4 +13,7 @@ if you want to set it up locally you can:
 3. run `pip install requirements.txt`
 
 Notice, that because requesting data to the spotify api my take a while, so the loading times will be slower.
+
 all the secret variables are stored in the .env file, you can create yours or use the ones already on the file.
+
+soon we will have this project deployed.
