@@ -155,3 +155,29 @@ footer nav a:hover {
 .charts h3 {
 	color: #5070dd;
 }
+
+.collapsible {
+	background-color: #5070dd;
+	color: white;
+	cursor: pointer;
+	padding: 30px;
+	width: 100%;
+	border: none;
+	text-align: left;
+	outline: none;
+	font-size: 25px;
+	font-family: 'Poppins';
+	font-weight: 600;
+	height: 30px;
+}
+.collapsible:hover {
+	background-color: #ccc;
+}
+.content {
+	padding: 0 18px;
+	display: none;
+	overflow: hidden;
+	background-color: rgb(27, 27, 27);
+	font-size: 18px;
+	font-weight: 300;
+}

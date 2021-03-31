@@ -35,24 +35,26 @@ class getuserdata:
         code = request.GET.get('code')
         error = request.GET.get('error')
         if error:
-            return redirect('https://spotistats-visualizer.herokuapp.com/error')
+            return redirect('http://127.0.0.1:8000/error')
         credentials= tk.Credentials(*conf)
         not_refreshing_user_token = credentials.request_user_token(str(code))
         self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
-        while self.refreshing_user_token == False:
+        if code== False:
+            code = request.GET.get('code')
+            credentials= tk.Credentials(*conf)
             not_refreshing_user_token = credentials.request_user_token(str(code))
             self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
 
         return redirect(config('STATS_PAGE'))
 
-    def userdata(self,request):
+    def userdata(self, request):
         #instanciate spotify class
         spotify = tk.Spotify(self.refreshing_user_token)
         #get user top tracks
         tracks = spotify.current_user_top_tracks(time_range = 'medium_term', limit=50, offset=0)
         tracks_items = [t for t in tracks.items]
         if not tracks_items:
-            return redirect('https://spotistats-visualizer.herokuapp.com/nodata')
+            return redirect('http://127.0.0.1:8000/nodata')
         else:
             tracks_name = [t.name for t in tracks.items]
             #get audio analysis of top user tracks
@@ -148,7 +150,6 @@ class getuserdata:
             long_frame = pd.concat(numeric_only_frames)
             long_frame2 = long_frame.reset_index()
             final_long_frame = long_frame2.astype({'property': str})
-            final_long_frame.to_excel('test2.xlsx')
             # final_long_frame= final_long_frame.drop([2, 5, 7, 10, 11, 15, 18,20,  23, 24, 28, 31,33, 36, 37 ])
             # df1_melt_mean_reset = df1_melt_mean.reset_index()
 
