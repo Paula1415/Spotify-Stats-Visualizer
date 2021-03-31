@@ -73,7 +73,7 @@ class getuserdata:
             user_df_nameindex2 = user_df_nameindex2.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'mode', 'key'])
             # user_df_nameindex2.to_excel('nameasindex.xlsx')
 
-            userdf_nottruncated = user_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode'])
+            userdf_nottruncated = user_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' , 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
 
 
 
@@ -90,7 +90,7 @@ class getuserdata:
             global_df['name'] = top_50_global_names
             global_df['playlist'] = 'Top 50: Global'
 
-            global_df_numeric = global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
+            global_df_numeric = global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' , 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
 
 
             # get audio analysis of today top hits
@@ -106,40 +106,40 @@ class getuserdata:
             today_global_df['name'] = top_50_today_names
             today_global_df['playlist'] = "Today's Top Hits"
 
-            today_global_df_numeric = today_global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
-            today_global_df_numeric.to_excel('numericglobal.xlsx')
+            today_global_df_numeric = today_global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' , 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
 
 
             frames_to_merge = [user_df, global_df, today_global_df]
             tidy_frame = pd.concat(frames_to_merge)
             # tidy_frame.to_excel('tidyframe.xlsx')
 
-            df1_melt = pd.melt(user_df, id_vars=['playlist'], var_name='property')
-            df2_melt = pd.melt(global_df, id_vars=['playlist'], var_name='property')
-            df3_melt = pd.melt(today_global_df, id_vars=['playlist'],var_name='property')
+            df1_melt = pd.melt(userdf_nottruncated, id_vars=['playlist'], var_name='property')
+            df2_melt = pd.melt(global_df_numeric, id_vars=['playlist'], var_name='property')
+            df3_melt = pd.melt(today_global_df_numeric, id_vars=['playlist'],var_name='property')
+            # df1_melt.to_excel('test.xlsx')
 
             #------------- Organizing dataframes from wide to long for plotting barplot-------------------------
 
             ## ----------------user dataframe---------------
-            df1_melt_nonnumeric = df1_melt[df1_melt['value'].apply(lambda x: type(x) in [int, np.int64, float, np.float64])]
-            df1_melt_nonnumeric['value'] = pd.to_numeric(df1_melt_nonnumeric['value'])
+            # df1_melt_nonnumeric = df1_melt[df1_melt['value'].apply(lambda x: type(x) in [int, np.int64, float, np.float64])]
+            # df1_melt_nonnumeric['value'] = pd.to_numeric(df1_melt_nonnumeric['value'])
 
-            df1_melt_mean = df1_melt_nonnumeric.groupby(['property']).mean(numeric_only = True)
+            df1_melt_mean = df1_melt.groupby(['property']).mean(numeric_only = True)
             df1_melt_mean['playlist'] = 'Your Top 50 Tracks'
 
             ##-----------------global dataframe -------------------------
-            df2_melt_nonnumeric = df2_melt[df2_melt['value'].apply(lambda x: type(x) in [int, np.int64, float, np.float64])]
-            df2_melt_nonnumeric['value'] = pd.to_numeric(df2_melt_nonnumeric['value'])
+            # df2_melt_nonnumeric = df2_melt[df2_melt['value'].apply(lambda x: type(x) in [int, np.int64, float, np.float64])]
+            # df2_melt_nonnumeric['value'] = pd.to_numeric(df2_melt_nonnumeric['value'])
 
-            df2_melt_mean = df2_melt_nonnumeric.groupby(['property']).mean(numeric_only = True)
+            df2_melt_mean = df2_melt.groupby(['property']).mean(numeric_only = True)
             df2_melt_mean['playlist'] = 'Top Global 50'
 
 
             ##-----------------top hits dataframe -----------------------------
-            df3_melt_nonnumeric = df3_melt[df3_melt['value'].apply(lambda x: type(x) in [int, np.int64, float, np.float64])]
-            df3_melt_nonnumeric['value'] = pd.to_numeric(df3_melt_nonnumeric['value'])
+            # df3_melt_nonnumeric = df3_melt[df3_melt['value'].apply(lambda x: type(x) in [int, np.int64, float, np.float64])]
+            # df3_melt_nonnumeric['value'] = pd.to_numeric(df3_melt_nonnumeric['value'])
 
-            df3_melt_mean = df3_melt_nonnumeric.groupby(['property']).mean(numeric_only = True)
+            df3_melt_mean = df3_melt.groupby(['property']).mean(numeric_only = True)
             df3_melt_mean['playlist'] = 'Top 50 daily Hits'
 
 
@@ -148,8 +148,9 @@ class getuserdata:
             long_frame = pd.concat(numeric_only_frames)
             long_frame2 = long_frame.reset_index()
             final_long_frame = long_frame2.astype({'property': str})
-            final_long_frame= final_long_frame.drop([2, 5, 7, 10, 11, 15, 18,20,  23, 24, 28, 31,33, 36, 37 ])
-            df1_melt_mean_reset = df1_melt_mean.reset_index()
+            final_long_frame.to_excel('test2.xlsx')
+            # final_long_frame= final_long_frame.drop([2, 5, 7, 10, 11, 15, 18,20,  23, 24, 28, 31,33, 36, 37 ])
+            # df1_melt_mean_reset = df1_melt_mean.reset_index()
 
             #-----------PLOTS----------------------------------------
             # scatterplot
@@ -171,7 +172,7 @@ class getuserdata:
 
             #bar catplot
             bar_catplot = sns.catplot(
-                kind="bar",data=final_long_frame, x="property", y= "value", palette="mako", hue="playlist", legend=True)
+                kind="bar",data=long_frame2, x="property", y= "value", palette="mako", hue="playlist", legend=True)
             bar_catplot.fig.suptitle("mean values of the audio features")
             for axes in bar_catplot.axes.flat:
                 _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=90)
