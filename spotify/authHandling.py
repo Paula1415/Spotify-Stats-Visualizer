@@ -38,7 +38,7 @@ class getuserdata:
         credentials= tk.Credentials(*conf)
         not_refreshing_user_token = credentials.request_user_token(str(code))
         self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
-        return redirect('https://spotistats-visualizer.herokuapp.com/Stats')
+        return redirect(config('STATS_PAGE'))
 
     def userdata(self,request):
         #instanciate spotify class
@@ -53,7 +53,7 @@ class getuserdata:
             #get audio analysis of top user tracks
             tracks_ids = [i.id for i in tracks.items]
             # get artists
-            artists = spotify.current_user_top_artists(time_range = 'medium_term', limit=5, offset=0)
+            artists = spotify.current_user_top_artists(time_range = 'medium_term', limit=10, offset=0)
             artist_name = [t.name for t in artists.items]
             usertracks_audio_features = spotify.tracks_audio_features(tracks_ids).json()
             usertracks_data  = pd.read_json(StringIO(usertracks_audio_features))
@@ -85,8 +85,7 @@ class getuserdata:
             global_df['name'] = top_50_global_names
             global_df['playlist'] = 'Top 50: Global'
 
-            global_df_numeric = global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode'])
-            global_df_numeric.to_excel('globaldf.xlsx')
+            global_df_numeric = global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
 
 
             # get audio analysis of today top hits
@@ -102,7 +101,7 @@ class getuserdata:
             today_global_df['name'] = top_50_today_names
             today_global_df['playlist'] = "Today's Top Hits"
 
-            today_global_df_numeric = today_global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode'])
+            today_global_df_numeric = today_global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
 
 
             frames_to_merge = [user_df, global_df, today_global_df]
@@ -145,7 +144,6 @@ class getuserdata:
             long_frame2 = long_frame.reset_index()
             final_long_frame = long_frame2.astype({'property': str})
             final_long_frame= final_long_frame.drop([2, 5, 7, 10, 11, 15, 18,20,  23, 24, 28, 31,33, 36, 37 ])
-            final_long_frame.to_excel('longframe.xlsx')
             df1_melt_mean_reset = df1_melt_mean.reset_index()
 
             #-----------PLOTS----------------------------------------
@@ -158,6 +156,7 @@ class getuserdata:
             matplotlib.rc('xtick', direction='out', color='gray')
             matplotlib.rc('ytick', direction='out', color='gray')
             matplotlib.rc('lines', linewidth=2)
+
             stripplot = sns.scatterplot(data=tidy_frame, x="energy", y="valence", hue="playlist",palette="mako", s=100)
             scatterplot_tmpfile = BytesIO()
             stripplot.figure.savefig(scatterplot_tmpfile, format ='png', facecolor="#1b1b1b")
@@ -184,7 +183,6 @@ class getuserdata:
             heatmap = sns.heatmap(data=user_df_nameindex2, annot=True, linewidth=0.5, linecolor='#8c8c8c', cmap="mako")
             heatmap_tmpfile = BytesIO()
             heatmap.figure.savefig(heatmap_tmpfile, format ='png', bbox_inches = "tight", facecolor="#1b1b1b")
-            heatmap.figure.savefig('heatmap.png')
             plt.close()
             heatmap_encoded = base64.b64encode(heatmap_tmpfile.getvalue()).decode('utf-8')
             heatmap_render = r"<img src='data:image/png;base64,{}'>".format(heatmap_encoded)
@@ -207,14 +205,24 @@ class getuserdata:
 
             #today top hits kde
 
-            kde_plot_todhits = sns.kdeplot(data=today_global_df_numeric, palette="mako")
+            kde_plot_todhits = sns.kdeplot(data=today_global_df_numeric, palette="mako", fill=True)
             todhits_kde_tmpfile = BytesIO()
             kde_plot_todhits.figure.savefig(todhits_kde_tmpfile, format ='png', facecolor="#1b1b1b")
             plt.close()
             todhits_encoded_kde = base64.b64encode(todhits_kde_tmpfile.getvalue()).decode('utf-8')
             todhits_kde_render = r"<img src='data:image/png;base64,{}'>".format(todhits_encoded_kde)
 
-            context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render,  'kdeplot': kde_render, 'todaykde': todhits_kde_render, 'globalkde': global_kde_render, 'artists': artist_name }
+            facetgrid= sns.catplot(data=tidy_frame,x = 'valence', y='danceability', col='playlist', palette='mako')
+            for axes in facetgrid.axes.flat:
+                __ = axes.set_xticklabels([])
+            plt.tight_layout()
+            facet_tmpfile = BytesIO()
+            facetgrid.savefig(facet_tmpfile, format ='png', facecolor="#1b1b1b")
+            plt.close()
+            facet_encoded = base64.b64encode(facet_tmpfile.getvalue()).decode('utf-8')
+            facet_render = r"<img src='data:image/png;base64,{}'>".format(facet_encoded)
+
+            context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render,  'kdeplot': kde_render, 'todaykde': todhits_kde_render, 'globalkde': global_kde_render, 'artists': artist_name , 'facetplot':facet_render}
 
             return render(request, 'userdata.html', context)
 

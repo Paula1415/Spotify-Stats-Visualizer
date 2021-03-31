@@ -5,42 +5,72 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tracks</title>rel="stylesheet">
+    <title>tracks</title>
     <script src="https://kit.fontawesome.com/38a8e64623.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'spotify/css/statspage.css' %}">
 </head>
-<body>
-    <h1>Your Stats</h1>
-    {% block include %}
-        <h3>top tracks </h3>
-        <div class="top-tracks">
+<header>
+    <div class="topnav">
+        <i class="fas fa-headphones fa-5x" style="color: white;"></i>
+        <a href="" class="logo"> SpotiStats</a>
+        <nav>
             <ul>
+                <li><a href="/get-auth-url/" class="elem"> Login </a></li>
+                <li><i class="fab fa-github fa-2x"></i><a href="https://github.com/Paula1415/Spotify-stats-visualizer" class="elem">Github</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<body>
+    {% block include %}
+    <h1 class="main-text">Your Stats</h1>
+    <div class="charts">
+        <div class="top-tracks">
+            <h3>top tracks </h3>
+            <ol>
                 <li>{{ tracks.0 }}</li>
                 <li>{{ tracks.1 }}</li>
                 <li>{{ tracks.2 }}</li>
                 <li>{{ tracks.3 }}</li>
                 <li>{{ tracks.4 }}</li>
-            </ul>
+                <li>{{ tracks.5 }}</li>
+                <li>{{ tracks.6 }}</li>
+                <li>{{ tracks.7 }}</li>
+                <li>{{ tracks.8 }}</li>
+                <li>{{ tracks.9 }}</li>
+            </ol>
         </div>
-        <h3>top artists</h3>
         <div class="top-artists">
-            <ul>
+            <h3>top artists</h3>
+            <ol>
                 <li>{{ artists.0 }}</li>
                 <li>{{ artists.1 }}</li>
                 <li>{{ artists.2 }}</li>
                 <li>{{ artists.3 }}</li>
                 <li>{{ artists.4 }}</li>
-            </ul>
+                <li>{{ artists.5 }}</li>
+                <li>{{ artists.6 }}</li>
+                <li>{{ artists.7 }}</li>
+                <li>{{ artists.8 }}</li>
+                <li>{{ artists.9 }}</li>
+            </ol>
         </div>
+
+    </div>
     </div>
     <div class="plots">
-        {{ stripplot|safe }}
+        <div class="plt">
+            <p>on this plot we show the relation between valence and energy of the tracks, <br>points toward the top right corner, will be more energetic and happier,<br> and points toward the bottom right corner, slower and more sad</p>
+            {{ stripplot|safe }}
+        </div>
         <h3> Barplot comparing audio features</h3>
         {{ bar_catplot|safe }}
         <h3>heatmap showing the value of each feature: min:0, max:1</h3>
         {{ heatmap|safe }}
+        <h3>violin plot comparing the audio features between the three playlists</h3>
+        {{ facetplot|safe }}
         <div class="row">
             <h3>kde plot showing the mean of every feature</h3>
             <div class="column">
@@ -60,4 +90,14 @@
     </div>
     {% endblock include %}
 </body>
+<footer>
+    <div class="wrapper">
+        <nav>
+            <ul>
+                <li class="login"><a href="/get-auth-url/" > Login </a></li>
+                <li><i class="fab fa-github fa-2x"></i><a href="https://github.com/Paula1415/Spotify-stats-visualizer">Github</a></li>
+            </ul>
+        </nav>
+    </div>
+</footer>
 </html>
