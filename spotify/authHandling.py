@@ -39,7 +39,7 @@ class getuserdata:
         credentials= tk.Credentials(*conf)
         not_refreshing_user_token = credentials.request_user_token(str(code))
         self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
-        if self.refreshing_user_token == False:
+        while self.refreshing_user_token == False:
             not_refreshing_user_token = credentials.request_user_token(str(code))
             self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
 
