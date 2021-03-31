@@ -4,6 +4,7 @@ from requests import Request
 from django.shortcuts import redirect, render
 import json
 import pandas as pd
+pd.options.mode.chained_assignment = None
 from io import BytesIO, StringIO
 import base64
 import matplotlib
@@ -106,12 +107,12 @@ class getuserdata:
             today_global_df['playlist'] = "Today's Top Hits"
 
             today_global_df_numeric = today_global_df.drop(columns=['id', 'analysis_url','time_signature', 'track_href', 'type', 'uri', 'name' ,'playlist', 'duration_ms', 'tempo', 'loudness', 'key', 'mode', 'instrumentalness'])
+            today_global_df_numeric.to_excel('numericglobal.xlsx')
 
 
             frames_to_merge = [user_df, global_df, today_global_df]
             tidy_frame = pd.concat(frames_to_merge)
             # tidy_frame.to_excel('tidyframe.xlsx')
-            onlynum_tidyframe = tidy_frame.drop(['id', 'analysis_url', 'duration_ms','key', 'loudness', 'tempo', 'time_signature', 'track_href', 'type', 'uri', 'name'], axis=1)
 
             df1_melt = pd.melt(user_df, id_vars=['playlist'], var_name='property')
             df2_melt = pd.melt(global_df, id_vars=['playlist'], var_name='property')
