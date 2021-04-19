@@ -14,6 +14,7 @@ import seaborn as sns
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
 import textwrap
+from apscheduler.schedulers.background import BackgroundScheduler, BlockingScheduler
 
 class getuserdata:
     def __init__(self):
@@ -45,7 +46,7 @@ class getuserdata:
             not_refreshing_user_token = credentials.request_user_token(str(code))
             self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
 
-        return redirect(config('STATS_PAGE'))
+        return redirect(config('WAITING_PAGE'))
 
     def userdata(self, request):
         #instanciate spotify class
@@ -232,6 +233,18 @@ class getuserdata:
             context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render,  'kdeplot': kde_render, 'todaykde': todhits_kde_render, 'globalkde': global_kde_render, 'artists': artist_name , 'facetplot':facet_render}
 
             return render(request, 'userdata.html', context)
+
+    def generating_stats(self, request):
+        scheduler = BackgroundScheduler(daemon=True)
+        job = scheduler.add_job(lambda: self.userdata(request))
+        scheduler.start()
+        return job
+
+    def waiting(self, request):
+        return render(request,'waiting.html')
+
+
+
 
 
 

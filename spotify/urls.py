@@ -7,6 +7,7 @@ urlpatterns = [
     path('callback/', views.callback),
     path('Stats/', views.getuserdata),
     path('nodata/', views.no_data),
-    path('error/', views.on_error)
+    path('error/', views.on_error),
+    path ('generating-stats/', views.waiting_page)
 
 ]
