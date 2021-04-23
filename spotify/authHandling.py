@@ -14,7 +14,7 @@ import seaborn as sns
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
 import textwrap
-from apscheduler.schedulers.background import BackgroundScheduler, BlockingScheduler
+
 
 class getuserdata:
     def __init__(self):
@@ -234,14 +234,6 @@ class getuserdata:
 
             return render(request, 'userdata.html', context)
 
-    def generating_stats(self, request):
-        scheduler = BackgroundScheduler(daemon=True)
-        job = scheduler.add_job(lambda: self.userdata(request))
-        scheduler.start()
-        return job
-
-    def waiting(self, request):
-        return render(request,'waiting.html')
 
 
 
