@@ -8,6 +8,7 @@ urlpatterns = [
     path('Stats/', views.getuserdata),
     path('nodata/', views.no_data),
     path('error/', views.on_error),
-    path('generating-stats/', views.waiting_page)
+    path('generating-stats/', views.waiting_page),
+    path('data/', views.data)
 
 ]

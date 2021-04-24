@@ -4,7 +4,7 @@ from requests import Request, post,get
 from urllib.parse import urlparse
 from .authHandling import getuserdata
 from apscheduler.schedulers.background import BackgroundScheduler, BlockingScheduler
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, JobExecutionEvent
 from .task import task
 
@@ -29,7 +29,16 @@ def landingPage(request):
 def on_error(request):
     return render(request, 'onerror.html', context={ 'auth': 'http://127.0.0.1:8000/get-auth-url/'})
 
-scheduler = ''
+def data(request):
+    job = task()
+    while True:
+        if job:
+            return JsonResponse(job)
+            break
+        else:
+            pass
+
 def waiting_page(request):
-    task(request)
+    token = spotify.token()
+    data(request, token)
     return HttpResponse('waiting...')

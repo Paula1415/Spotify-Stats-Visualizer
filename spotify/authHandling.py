@@ -14,11 +14,13 @@ import seaborn as sns
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
 import textwrap
+from django.http import JsonResponse
 
 
 class getuserdata:
     def __init__(self):
         self.refreshing_user_token = None
+        self.code = None
     def getauth(self, request):
         # redirect the user to spotify auth and ask for permission, return code to be exchanged for token and refresh token
         scopes = 'user-top-read '
@@ -45,12 +47,22 @@ class getuserdata:
             credentials= tk.Credentials(*conf)
             not_refreshing_user_token = credentials.request_user_token(str(code))
             self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
+            while True:
+                if self.refreshing_user_token == False:
+                    not_refreshing_user_token = credentials.request_user_token(str(code))
+                    self.refreshing_user_token = tk.RefreshingToken(not_refreshing_user_token, credentials)
+                else:
+                    break
 
         return redirect(config('WAITING_PAGE'))
 
-    def userdata(self, request):
+    def token(self):
+        return self.refreshing_user_token
+
+
+    def userdata(self, token):
         #instanciate spotify class
-        spotify = tk.Spotify(self.refreshing_user_token)
+        spotify = tk.Spotify(token)
         #get user top tracks
         tracks = spotify.current_user_top_tracks(time_range = 'medium_term', limit=50, offset=0)
         tracks_items = [t for t in tracks.items]
@@ -232,7 +244,7 @@ class getuserdata:
 
             context = {'tracks' : tracks_name, 'stripplot': stripplot_render, 'bar_catplot': catplot_render, 'heatmap': heatmap_render,  'kdeplot': kde_render, 'todaykde': todhits_kde_render, 'globalkde': global_kde_render, 'artists': artist_name , 'facetplot':facet_render}
 
-            return render(request, 'userdata.html', context)
+            return context
 
 
 
