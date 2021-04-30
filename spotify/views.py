@@ -29,16 +29,3 @@ def landingPage(request):
 def on_error(request):
     return render(request, 'onerror.html', context={ 'auth': 'http://127.0.0.1:8000/get-auth-url/'})
 
-def data(request):
-    job = task()
-    while True:
-        if job:
-            return JsonResponse(job)
-            break
-        else:
-            pass
-
-def waiting_page(request):
-    token = spotify.token()
-    data(request, token)
-    return HttpResponse('waiting...')
